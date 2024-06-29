@@ -40,10 +40,7 @@ def compile_code():
     elif language == 'c':
 
         result = execute_c_code(code)
-        print("------------------------")
 
-        print(result)
-        print("------------------------")
         logger.info(f"Execution result: {result}")
 
     return jsonify(result)
