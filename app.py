@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 from validator.check_validation import validateRequest
-from services.compile_code import execute_c_code, execute_python_code
+from services.compile_code_service import compileCodeService
 from utils import check_non_supported_modules
 
 app = Flask(__name__)
@@ -33,13 +33,13 @@ def compile_code():
         if non_supported_modules:
             return jsonify(non_supported_modules), 400
 
-        result = execute_python_code(code)
+        result = compileCodeService().execute_python_code(code)
 
         logger.info(f"Execution result: {result}")
 
     elif language == 'c':
 
-        result = execute_c_code(code)
+        result = compileCodeService().execute_c_code(code)
 
         logger.info(f"Execution result: {result}")
 
