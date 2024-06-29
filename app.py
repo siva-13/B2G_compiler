@@ -24,7 +24,7 @@ def compile_code():
     if validate_request:
         return jsonify(validate_request)
     
-    language = data.get('language')
+    language = data.get('language').lower()
     code  = data.get('code')
 
     if language == 'python':
