@@ -1125,6 +1125,7 @@ for x in range(5):
 # Function to send a POST request with a given payload
 def send_request(payload):
     try:
+        payload['language'] = 'python'
         response = requests.post(url, json=payload)
         return response.status_code, response.json()
     except Exception as e:
