@@ -11,51 +11,43 @@ logger = logging.getLogger(__name__)
 
 class compileCodeService:
     def execute_python_code(self, code):
-        # Create a string buffer to capture output
-        output_buffer = io.StringIO()
-        sys.stdout = output_buffer
-
-        # Prepare a dictionary to store the local execution context
-        local_vars = {}
-
         try:
             start_time = time.time()
 
             # Execute the code within the local_vars context
-            with tempfile.NamedTemporaryFile(mode='w', delete=False) as tmp_file:
+            with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.py') as tmp_file:
                 tmp_filename = tmp_file.name
                 tmp_file.write(code)
 
             # Execute the code from the temporary file
-            with open(tmp_filename, 'r') as file:
-                exec(file.read(), globals())
+            result = subprocess.run(['python', tmp_filename], capture_output=True, text=True)
 
-            end_time = time.time()
+            execution_time = time.time() - start_time
 
-            execution_time = end_time - start_time
+            os.remove(tmp_filename)
 
-            # Reset stdout
-            sys.stdout = sys.__stdout__
-
-            # Get the captured output
-            output = output_buffer.getvalue()
-
-            return {
-                'status': 'success',
-                'exit_code': 0,
-                'output': output,
-                'execution_time': execution_time
-            }
+            # Prepare the response
+            if result.returncode == 0:
+                return {
+                    'status': 'success',
+                    'exit_code': result.returncode,
+                    'output': result.stdout,
+                    'execution_time': execution_time
+                }
+            else:
+                return {
+                    'status': 'error',
+                    'exit_code': result.returncode,
+                    'error': result.stderr,
+                    'traceback': None,
+                    'execution_time': execution_time
+                }
 
         except Exception as e:
-            # Reset stdout
-            sys.stdout = sys.__stdout__
 
-            # Log the exception
             logger.error(f"Error executing code: {e}")
             logger.error(traceback.format_exc())
 
-            # Return the traceback as error
             return {
                 'status': 'error',
                 'exit_code': 1,  # Indicates error
