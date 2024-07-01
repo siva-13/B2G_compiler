@@ -20,7 +20,7 @@ class compileCodeService:
                 tmp_file.write(code)
 
             # Execute the code from the temporary file
-            result = subprocess.run(['python', tmp_filename], capture_output=True, text=True)
+            result = subprocess.run(['python3', tmp_filename], capture_output=True, text=True)
 
             execution_time = time.time() - start_time
 
