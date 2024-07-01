@@ -22,7 +22,13 @@ class compileCodeService:
             start_time = time.time()
 
             # Execute the code within the local_vars context
-            exec(code, {}, local_vars)
+            with tempfile.NamedTemporaryFile(mode='w', delete=False) as tmp_file:
+                tmp_filename = tmp_file.name
+                tmp_file.write(code)
+
+            # Execute the code from the temporary file
+            with open(tmp_filename, 'r') as file:
+                exec(file.read(), globals())
 
             end_time = time.time()
 
